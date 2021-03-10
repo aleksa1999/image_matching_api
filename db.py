@@ -2,42 +2,47 @@ import pymssql
 import ast
 
 
-def save_text(filename, text):
-    file1 = open(filename, 'w')
-    file1.write(text)
-    file1.close()
+class DatabaseProcess:
+    def __init__(self, local=True, field_limit=0):
+        self.features = self.load_database(local, field_limit)
 
+    @staticmethod
+    def load_database(local=True, field_limit=0):
+        print("Loading database ...")
+        if local:
+            conn = pymssql.connect(host='NS3013855\SQLSERVER_2016',
+                                   user='sa',
+                                   password='?ZE?[cUh{Br%58V[',
+                                   database='Sample_NearestNeighbour')
+        else:
+            conn = pymssql.connect(host='145.239.254.185\SQLSERVER_2016',
+                                   user='nikita',
+                                   password='nikita',
+                                   database='Sample_NearestNeighbour')
 
-def load_database():
-    conn = pymssql.connect(
-        host='145.239.254.185\SQLSERVER_2016',
-        user='nikita',
-        password='nikita',
-        database='Sample_NearestNeighbour')
+        cursor = conn.cursor()
+        cursor.execute('SELECT ID, Vector FROM Datafeed_100K')
 
-    cursor = conn.cursor()
-    cursor.execute('SELECT ID, Vector FROM Datafeed_100K')
+        feature_dict = {}
+        for row in cursor:
+            try:
+                field_id = row[0]
+                field_feature = ast.literal_eval(row[1])
+                feature_str = field_feature['result']['feature']
+                feature = ast.literal_eval(feature_str)
 
-    store_size = 10
-    index = 0
-    data_list = ''
-    for row in cursor:
-        try:
-            field_id = row[0]
-            field_feature = ast.literal_eval(row[1])
-            feature_str = field_feature['result']['feature']
-            feature = ast.literal_eval(feature_str)
-            data = f'{field_id},{feature_str}'
-            data_list += data + '\n'
-            index += 1
-            if index % store_size == 0:
-                save_text(f'db/{str(int(index/store_size))}.txt', data_list)
-                data_list = ''
+                feature_dict[field_id] = feature
 
-            print(field_id)
-        except Exception as e:
-            print(e)
+                if len(feature_dict) >= field_limit > 0:
+                    break
+
+            except Exception as e:
+                print(e)
+
+        return feature_dict
 
 
 if __name__ == '__main__':
-    load_database()
+    # class_db = DatabaseProcess(local=False, field_limit=20)
+    class_db = DatabaseProcess(local=True)
+    print(class_db.features)
