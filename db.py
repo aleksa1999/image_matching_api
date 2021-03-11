@@ -1,3 +1,4 @@
+import numpy as np
 import pymssql
 import json
 import ast
@@ -29,7 +30,7 @@ class DatabaseProcess:
                 feature_str = field_feature['result']['feature']
                 feature = ast.literal_eval(feature_str)
 
-                feature_dict[field_id] = feature
+                feature_dict[field_id] = np.array(feature)
 
                 if len(feature_dict) >= field_limit > 0:
                     break

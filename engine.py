@@ -18,13 +18,14 @@ class Engine:
 
     def compare_image(self, img_file):
         img_feature = self.get_feature(img_file)
+        img_feature = np.array(img_feature)
 
         # --------------- find nearest feature -----------------
         min_dist = -1
         min_id = -1
 
         for fid in self.db_features:
-            dist = np.linalg.norm(np.array(img_feature) - np.array(self.db_features[fid]))
+            dist = np.linalg.norm(img_feature - self.db_features[fid])
 
             if min_dist == -1 or dist < min_dist:
                 min_dist = dist

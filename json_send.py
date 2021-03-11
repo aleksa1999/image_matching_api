@@ -69,15 +69,15 @@ if __name__ == '__main__':
         # filename = '../1.png'
         filename = 'https://asset.conrad.com/media10/isa/160267/c1/-/en/301550_BB_00_FB/image?x=400&y=400&ex=400&ey=400&align=center&format=jpg'
 
-    url_server = 'http://localhost:3000/image_service/v1.0'
-    # url_server = 'http://149.202.76.203:3000/image_service/v1.0'
+    # url_server = 'http://localhost:3000/image_service/v1.0'
+    url_server = 'http://149.202.76.203:3000/image_service/v1.0'
 
-    # json_request = make_request_get_feature_img_filename(filename)
+    json_request = make_request_get_feature_img_filename(filename)
     # json_request = make_request_get_feature_img_base64(filename)
     # json_request = make_request_get_feature_img_link(filename)
     # json_request = make_request_match_img_filename(filename)
     # json_request = make_request_match_img_base64(filename)
-    json_request = make_request_match_img_link(filename)
+    # json_request = make_request_match_img_link(filename)
 
     ret_response = send_request(url_server, json_request)
 
