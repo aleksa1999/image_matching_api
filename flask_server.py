@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 from datetime import datetime
 from engine import Engine
+from Func import Func
+import requests
 import base64
 import os
 
@@ -25,20 +27,54 @@ class ImageApi(Resource):
         req_img_file = request_json['image']
 
         result = {}
-        if req_type == 'get_feature_filename':
-            img_feature = class_engine.get_feature(req_img_file)
-            result['feature'] = str(img_feature)
-        elif req_type == 'get_feature_base64':
-            temp_file = 'temp_{}.jpg'.format(datetime.now()).replace(":", "-").replace(" ", "-")
-            img_decode_b64(req_img_file, temp_file)
-            img_feature = class_engine.get_feature(temp_file)
-            result['feature'] = str(img_feature)
-            os.remove(temp_file)
+        temp_file = 'temp_{}.jpg'.format(datetime.now()).replace(":", "-").replace(" ", "-")
+        try:
+            if req_type == 'get_feature_filename':
+                img_feature = class_engine.get_feature(req_img_file)
+                result['feature'] = str(img_feature)
+
+            elif req_type == 'get_feature_base64':
+                img_decode_b64(req_img_file, temp_file)
+                img_feature = class_engine.get_feature(temp_file)
+                result['feature'] = str(img_feature)
+
+            elif req_type == 'get_feature_link':
+                with open(temp_file, 'wb') as f:
+                    r = requests.get(req_img_file)
+                    f.write(r.content)
+
+                if r.status_code == 200:
+                    ret_match = class_engine.get_feature(temp_file)
+                    result['feature'] = str(ret_match)
+
+            elif req_type == 'match_filename':
+                ret_match = class_engine.compare_image(req_img_file)
+                result['match'] = ret_match
+
+            elif req_type == 'match_base64':
+                img_decode_b64(req_img_file, temp_file)
+                ret_match = class_engine.compare_image(temp_file)
+                result['match'] = ret_match
+
+            elif req_type == 'match_link':
+                with open(temp_file, 'wb') as f:
+                    r = requests.get(req_img_file)
+                    f.write(r.content)
+
+                if r.status_code == 200:
+                    ret_match = class_engine.compare_image(temp_file)
+                    result['match'] = ret_match
+
+        except Exception as e:
+            print(e)
+
+        class_func.rm_file(temp_file)
 
         return jsonify(dict(result=result))
 
 
 class_engine = Engine()
+class_func = Func()
 
 app = Flask(__name__)
 api = Api(app)
