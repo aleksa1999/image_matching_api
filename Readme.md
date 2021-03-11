@@ -33,3 +33,31 @@
             "type": "get_feature_base64",
             "image": base64 of image
         }
+        
+- get feature request for image link
+
+        {
+            "type": "get_feature_link",
+            "image": link of image
+        }
+
+- find match result for image file name
+
+        {
+            "type": "match_filename",
+            "image": img_file_name
+        }
+        
+- find match result for base64 of image
+
+        {
+            "type": "match_base64",
+            "image": base64 of image
+        }
+        
+- find match result for image link
+
+        {
+            "type": "match_link",
+            "image": link of image
+        }
