@@ -3,8 +3,10 @@ from flask_restful import Resource, Api
 from datetime import datetime
 from engine import Engine
 from Func import Func
+import numpy as np
 import requests
 import base64
+import ast
 import os
 
 
@@ -64,6 +66,13 @@ class ImageApi(Resource):
                 if r.status_code == 200:
                     ret_match = class_engine.compare_image(temp_file)
                     result['match'] = ret_match
+
+            elif req_type == 'match_feature':
+                field_feature = ast.literal_eval(req_img_file)
+                feature_str = field_feature['result']['feature']
+                feature = np.array(ast.literal_eval(feature_str))
+                ret_match = class_engine.compare_feature(feature)
+                result['match'] = ret_match
 
         except Exception as e:
             print(e)

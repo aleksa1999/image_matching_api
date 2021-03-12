@@ -1,6 +1,8 @@
+from setting import THRESHOLD_ACCURACY
 from db import DatabaseProcess
 from Func import Func
 import numpy as np
+import json
 import time
 import sys
 
@@ -16,25 +18,37 @@ class Engine:
         img_feature = self.class_func.get_inception_feature(img_file)
         return img_feature
 
+    def compare_feature(self, feature):
+        # ------------ find the match result --------------
+        info_list = []
+        acc_list = []
+
+        for fid in self.db_features:
+            dist = np.linalg.norm(feature - self.db_features[fid])
+            acc = max(0, 1 - dist / 50)
+
+            if acc >= THRESHOLD_ACCURACY:
+                ret_field = self.class_db.find_id(fid)
+                ret_field['accuracy'] = acc
+
+                acc_list.append(acc)
+                info_list.append(ret_field)
+
+        # ---------------- sort result -----------------
+        result = {}
+        while len(acc_list) > 0:
+            max_ind = int(np.argmax(acc_list))
+            result[len(result) + 1] = info_list[max_ind]
+            acc_list.pop(max_ind)
+            info_list.pop(max_ind)
+
+        return result
+
     def compare_image(self, img_file):
         img_feature = self.get_feature(img_file)
         img_feature = np.array(img_feature)
 
-        # --------------- find nearest feature -----------------
-        min_dist = -1
-        min_id = -1
-
-        for fid in self.db_features:
-            dist = np.linalg.norm(img_feature - self.db_features[fid])
-
-            if min_dist == -1 or dist < min_dist:
-                min_dist = dist
-                min_id = fid
-
-        # ---------------- extract field info from db ------------
-        ret = self.class_db.find_id(min_id)
-
-        return ret
+        return self.compare_feature(img_feature)
 
 
 if __name__ == '__main__':
@@ -46,4 +60,4 @@ if __name__ == '__main__':
     class_engine = Engine()
 
     # class_engine.get_feature(filename)
-    print(class_engine.compare_image(filename))
+    print(json.dumps(class_engine.compare_image(filename), indent=4))
