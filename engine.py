@@ -1,4 +1,3 @@
-from setting import THRESHOLD_ACCURACY
 from db import DatabaseProcess
 from Func import Func
 import numpy as np
@@ -18,7 +17,7 @@ class Engine:
         img_feature = self.class_func.get_inception_feature(img_file)
         return img_feature
 
-    def compare_feature(self, feature):
+    def compare_feature(self, feature, acc_threshold):
         # ------------ find the match result --------------
         info_list = []
         acc_list = []
@@ -27,7 +26,7 @@ class Engine:
             dist = np.linalg.norm(feature - self.db_features[fid])
             acc = max(0, 1 - dist / 50)
 
-            if acc >= THRESHOLD_ACCURACY:
+            if acc >= acc_threshold:
                 ret_field = self.class_db.find_id(fid)
                 ret_field['accuracy'] = acc
 
@@ -44,11 +43,11 @@ class Engine:
 
         return result
 
-    def compare_image(self, img_file):
+    def compare_image(self, img_file, acc_threshold):
         img_feature = self.get_feature(img_file)
         img_feature = np.array(img_feature)
 
-        return self.compare_feature(img_feature)
+        return self.compare_feature(img_feature, acc_threshold)
 
 
 if __name__ == '__main__':
@@ -60,4 +59,4 @@ if __name__ == '__main__':
     class_engine = Engine()
 
     # class_engine.get_feature(filename)
-    print(json.dumps(class_engine.compare_image(filename), indent=4))
+    print(json.dumps(class_engine.compare_image(filename, acc_threshold=0.8), indent=4))
