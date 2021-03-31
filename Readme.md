@@ -41,23 +41,39 @@
             "image": link of image
         }
 
-- find match result for image file name
+- find match result for image file name ("accuracy" can be ignored, and then will use default value in setting.py)
 
         {
             "type": "match_filename",
+            "accuracy": accuracy_threshold,
             "image": img_file_name
         }
         
-- find match result for base64 of image
+- find match result for base64 of image ("accuracy" can be ignored, and then will use default value in setting.py)
 
         {
             "type": "match_base64",
+            "accuracy": accuracy_threshold,
             "image": base64 of image
         }
         
-- find match result for image link
+- find match result for image link ("accuracy" can be ignored, and then will use default value in setting.py)
 
         {
             "type": "match_link",
+            "accuracy": accuracy_threshold,
             "image": link of image
         }
+        
+- find match result for feature string ("accuracy" can be ignored, and then will use default value in setting.py)
+
+        {
+            "type": "match_feature",
+            "accuracy": accuracy_threshold,
+            "image": feature string
+        }
+        
+    sample of feature stringL
+        
+        "{\"result\":{\"feature\":\"[0.13205051, 0.16701862, 0.18179958, 0.0, 0.32239312, ... , 0.0060263807]\"}}\n"
+        
