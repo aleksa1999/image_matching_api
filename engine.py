@@ -10,7 +10,7 @@ class Engine:
 
     def __init__(self):
         self.class_func = Func()
-        self.class_db = DatabaseProcess(local=True)
+        self.class_db = DatabaseProcess(local=False)
         self.db_features = self.class_db.load_database(field_limit=0)
 
     def get_feature(self, img_file):
